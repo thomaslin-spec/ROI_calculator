@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asana ROI 計算機 - Master Concept 思想科技</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', 'PingFang TC', 'Microsoft JhengHei', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen">
+
+    <div class="max-w-6xl mx-auto px-4 py-8">
+        <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-4">
+            <div>
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="bg-blue-600 p-2 rounded-lg">
+                        <i data-lucide="calculator" class="text-white w-6 h-6"></i>
+                    </div>
+                    <h1 class="text-2xl font-bold tracking-tight text-slate-800">Asana 企業投資報酬率 (ROI) 評估器</h1>
+                </div>
+                <p class="text-slate-500">Master Concept 思想科技 — 協助您量化數位轉型的經濟效益</p>
+            </div>
+            <div class="flex items-center gap-4">
+                <img src="header.png" alt="MCI Logo" class="h-[120px] w-auto object-contain">
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="bg-white rounded-2xl p-6 shadow-sm border border-slate-200">
+                    <h2 class="text-lg font-semibold mb-6 flex items-center gap-2">
+                        <i data-lucide="settings-2" class="w-5 h-5 text-blue-600"></i> 參數設定
+                    </h2>
+
+                    <div class="space-y-5">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                                員工總數 <span id="val-employees" class="text-blue-600 font-bold">50</span>
+                            </label>
+                            <input type="range" id="input-employees" min="5" max="500" value="50" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">平均月薪 (TWD)</label>
+                            <div class="relative">
+                                <span class="absolute left-3 top-2.5 text-slate-400">NT$</span>
+                                <input type="number" id="input-salary" value="60000" class="w-full pl-12 pr-4 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2 flex justify-between">
+                                每週節省時間/人 <span id="val-hours" class="text-blue-600 font-bold">5 小時</span>
+                            </label>
+                            <input type="range" id="input-hours" min="1" max="15" step="0.5" value="5" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-[10px] text-slate-400 mt-2">註：包含減少開會、追蹤進度與搜尋文件的時間</p>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100">
+                            <label class="block text-sm font-medium text-slate-700 mb-2">Asana 授權費用 (USD/人/月)</label>
+                            <select id="input-price" class="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                                <option value="13.5">Starter (約 $13.5)</option>
+                                <option value="30.5" selected>Advanced (約 $30.5)</option>
+                                <option value="45">Enterprise (約 $45)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-blue-600 rounded-2xl p-6 text-white shadow-lg shadow-blue-200">
+                    <h3 class="font-bold mb-2 flex items-center gap-2">
+                        <i data-lucide="lightbulb" class="w-5 h-5"></i> MCI 專業建議
+                    </h3>
+                    <p class="text-blue-100 text-sm leading-relaxed">
+                        根據台灣製造業導入經驗，初期目標設定在「節省週報彙整時間」，通常能直接提升 15% 以上的行政效率。
+                    </p>
+                    <button onclick="window.print()" class="mt-4 w-full bg-white/20 hover:bg-white/30 transition-colors py-2 rounded-lg text-sm font-medium border border-white/30">
+                        匯出 PDF 評估報告
+                    </button>
+                </div>
+            </div>
+
+            <div class="lg:col-span-2 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <p class="text-slate-500 text-sm font-medium mb-1">年度投資報酬率 (ROI)</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="res-roi" class="text-4xl font-bold text-emerald-600">0%</span>
+                            <span class="text-emerald-500 text-sm font-semibold">提升</span>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <p class="text-slate-500 text-sm font-medium mb-1">損益平衡週期</p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="res-payback" class="text-4xl font-bold text-blue-600">0</span>
+                            <span class="text-blue-500 text-sm font-semibold">個月回本</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-200">
+                    <h3 class="text-lg font-bold mb-6 text-slate-800 flex justify-between items-center">
+                        年度財務預估對比 (TWD)
+                        <span class="text-xs font-normal text-slate-400">匯率參考 1:32</span>
+                    </h3>
+                    <div class="relative h-[300px]">
+                        <canvas id="roiChart"></canvas>
+                    </div>
+
+                    <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6 pt-6 border-t border-slate-100">
+                        <div class="text-center md:text-left">
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">年度總持有成本</p>
+                            <p id="res-cost" class="text-xl font-bold text-slate-700 mt-1">NT$ 0</p>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">年度產值節省</p>
+                            <p id="res-savings" class="text-xl font-bold text-blue-600 mt-1">NT$ 0</p>
+                        </div>
+                        <div class="text-center md:text-left">
+                            <p class="text-xs text-slate-400 uppercase font-bold tracking-wider">首年淨營運回饋</p>
+                            <p id="res-net" class="text-xl font-bold text-emerald-600 mt-1">NT$ 0</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const exchangeRate = 32;
+        const inputs = {
+            employees: document.getElementById('input-employees'),
+            salary: document.getElementById('input-salary'),
+            hours: document.getElementById('input-hours'),
+            price: document.getElementById('input-price')
+        };
+
+        const displays = {
+            valEmployees: document.getElementById('val-employees'),
+            valHours: document.getElementById('val-hours'),
+            resRoi: document.getElementById('res-roi'),
+            resPayback: document.getElementById('res-payback'),
+            resCost: document.getElementById('res-cost'),
+            resSavings: document.getElementById('res-savings'),
+            resNet: document.getElementById('res-net')
+        };
+
+        const ctx = document.getElementById('roiChart').getContext('2d');
+        const roiChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['年度成本', '時間價值節省', '淨收益'],
+                datasets: [{
+                    data: [0, 0, 0],
+                    backgroundColor: ['#e2e8f0', '#3b82f6', '#10b981'],
+                    borderRadius: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        function calculate() {
+            const employees = parseInt(inputs.employees.value);
+            const salary = parseInt(inputs.salary.value);
+            const hoursPerWeek = parseFloat(inputs.hours.value);
+            const licenseUSD = parseFloat(inputs.price.value);
+
+            displays.valEmployees.textContent = employees;
+            displays.valHours.textContent = hoursPerWeek + ' 小時';
+
+            const hourlyRate = (salary * 1.2) / 160;
+            const annualCost = employees * licenseUSD * exchangeRate * 12;
+            const annualSavings = employees * hoursPerWeek * 52 * hourlyRate;
+            const netBenefit = annualSavings - annualCost;
+            const roi = (netBenefit / annualCost) * 100;
+            const payback = Math.max(0.1, (annualCost / (annualSavings / 12))).toFixed(1);
+
+            displays.resRoi.textContent = Math.round(roi) + '%';
+            displays.resPayback.textContent = payback;
+            displays.resCost.textContent = 'NT$ ' + Math.round(annualCost).toLocaleString();
+            displays.resSavings.textContent = 'NT$ ' + Math.round(annualSavings).toLocaleString();
+            displays.resNet.textContent = 'NT$ ' + Math.round(netBenefit).toLocaleString();
+
+            roiChart.data.datasets[0].data = [Math.round(annualCost), Math.round(annualSavings), Math.round(netBenefit)];
+            roiChart.update();
+        }
+
+        Object.values(inputs).forEach(input => input.addEventListener('input', calculate));
+        calculate();
+    </script>
+</body>
+</html>
